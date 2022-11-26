@@ -5,10 +5,15 @@ const $messageForm = document.querySelector('#message-form')
 const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $sendLocationButton = document.querySelector('#send-location')
+const sendAudioButton =document.getElementById('send-audio')
+const callButton =document.getElementById('callid')
+
 const $messages = document.querySelector('#messages')
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
+const audioTemplate = document.querySelector('#audio-template').innerHTML
+
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
 const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 
@@ -39,7 +44,6 @@ const autoscroll = () => {
 }
 
 socket.on('message', (message) => {
-    console.log(message)
     const html = Mustache.render(messageTemplate, {
         username: message.username,
         message: message.text,
@@ -48,9 +52,21 @@ socket.on('message', (message) => {
     $messages.insertAdjacentHTML('beforeend', html)
     autoscroll()
 })
+socket.on('audio', (message) => {
+    let audioData = new Blob(message.data,
+        { 'type': 'audio/mp3;' });
 
+let audioSrc = window.URL
+.createObjectURL(audioData)
+    const html = Mustache.render(audioTemplate, {
+        username: message.username,
+        audioData: audioSrc,
+        createdAt: moment(message.createdAt).format('h:mm a')
+    })
+    $messages.insertAdjacentHTML('beforeend', html)
+    autoscroll()
+})
 socket.on('locationMessage', (message) => {
-    console.log(message)
     const html = Mustache.render(locationMessageTemplate, {
         username: message.username,
         url: message.url,
@@ -105,6 +121,41 @@ $sendLocationButton.addEventListener('click', () => {
         })
     })
 })
+sendAudioButton.addEventListener('mousedown', (e) => {
+
+    
+
+    let audioIN = { audio: true };
+navigator.mediaDevices.getUserMedia(audioIN).then(function (mediaStreamObj) {
+    var dataaudio = [];
+    let mediaRecorder = new MediaRecorder(mediaStreamObj);
+    mediaRecorder.start()
+    
+    sendAudioButton.addEventListener('mouseup', (e) => {
+ mediaRecorder.stop()
+    })
+
+           
+
+mediaRecorder.ondataavailable = function (ev) {
+    dataaudio.push(ev.data);
+        socket.emit('sendAudio', dataaudio, (error) => {
+     
+        
+
+        if (error) {
+            return console.log(error)
+        }
+        data=[]
+    })
+		}
+        
+        
+		
+})
+
+    
+})
 
 socket.emit('join', { username, room }, (error) => {
     if (error) {
@@ -112,3 +163,4 @@ socket.emit('join', { username, room }, (error) => {
         location.href = '/'
     }
 })
+

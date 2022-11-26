@@ -3,7 +3,7 @@ const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
-const { generateMessage, generateLocationMessage } = require('./utils/messages')
+const { generateMessage, generateLocationMessage,generateAudioMessage } = require('./utils/messages')
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 
 const app = express()
@@ -46,6 +46,12 @@ io.on('connection', (socket) => {
         }
 
         io.to(user.room).emit('message', generateMessage(user.username, message))
+        callback()
+    })
+    socket.on('sendAudio', (data, callback) => {
+        const user = getUser(socket.id)
+
+        io.to(user.room).emit('audio', generateAudioMessage(user.username, data))
         callback()
     })
 

@@ -13,14 +13,19 @@
 
         </div>
         <div class="chat__main">
-            <div id="messages" class="chat__messages"></div>
+            <div id="messages" class="chat__messages">
+                
+            </div>
 
             <div class="compose">
                 <form id="message-form">
                     <input name="message" placeholder="Message" required autocomplete="off">
                     <button>Send</button>
                 </form>
-                <button id="send-location">Send location</button>
+                <button id="send-location" style="margin-right: 3px;">Send location</button>
+                <button id="send-audio" style="margin-right: 3px;">Send audio</button>
+                <button id="callid">Audio Call</button>
+
             </div>
         </div>
     </div>
@@ -34,7 +39,20 @@
                 <p>{{message}}</p>
             </div>
         </script>
-
+        <script id="audio-template" type="text/html">
+            <div class="message">
+                <p>
+                    <span class="message__name">{{username}}</span>
+                    <span class="message__meta">{{createdAt}}</span>
+                </p>
+                <audio src={{audioData}} controls autoplay></audio>
+            </div>
+        </script>
+        <script id="call-template" type="text/html">
+            
+                <audio src={{audioData}} controls autoplay style="display:none"></audio>
+            
+        </script>
     <script id="location-message-template" type="text/html">
             <div class="message">
                 <p>
